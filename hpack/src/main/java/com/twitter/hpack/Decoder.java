@@ -393,6 +393,13 @@ public final class Decoder {
   }
 
   /**
+   * Set maximum size of header list that the sender is prepared to accept.
+   */
+  public void setMaxHeaderSize(int maxHeaderSize) {
+    this.maxHeaderSize = maxHeaderSize;
+  }
+
+  /**
    * Set the maximum table size.
    * If this is below the maximum size of the dynamic table used by the encoder,
    * the beginning of the next header block MUST signal this change.
