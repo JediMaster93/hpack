@@ -89,7 +89,12 @@ public final class Decoder {
    * Decode the header block into header fields.
    */
   public void decode(InputStream in, HeaderListener headerListener) throws IOException {
+    boolean isReadLiteralOccurred = false;
     while (in.available() > 0) {
+      if (!isReadLiteralOccurred && state.ordinal() >= State.READ_LITERAL_HEADER_NAME_LENGTH_PREFIX.ordinal()) {
+        isReadLiteralOccurred = true;
+      }
+
       switch(state) {
       case READ_HEADER_REPRESENTATION:
         byte b = (byte) in.read();
@@ -122,6 +127,10 @@ public final class Decoder {
           }
         } else if ((b & 0x20) == 0x20) {
           // Dynamic Table Size Update
+          if (isReadLiteralOccurred) {
+            throw new IOException("Can not read indexed header after literal headers");
+          }
+
           index = b & 0x1F;
           if (index == 0x1F) {
             state = State.READ_MAX_DYNAMIC_TABLE_SIZE;
@@ -378,6 +387,10 @@ public final class Decoder {
 
       default:
         throw new IllegalStateException("should not reach here");
+      }
+
+      if (state == State.READ_LITERAL_HEADER_NAME_LENGTH_PREFIX && in.available() == 0) {
+        throw new IOException("No data to read from.");
       }
     }
   }
