@@ -74,7 +74,11 @@ public class DecoderBenchmark extends AbstractMicrobenchmarkBase {
         ByteArrayOutputStream outputStream = size.newOutputStream();
         for (int i = 0; i < headers.size(); ++i) {
             Header header = headers.get(i);
-            encoder.encodeHeader(outputStream, header.name, header.value, sensitive);
+            try {
+                encoder.encodeHeader(outputStream, header.name, header.value, sensitive);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return outputStream.toByteArray();
     }

@@ -56,14 +56,18 @@ public class EncoderBenchmark extends AbstractMicrobenchmarkBase {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void encode(Blackhole bh) throws IOException {
+    public void encode(Blackhole bh) throws Exception {
         Encoder encoder = new Encoder(maxTableSize);
         outputStream.reset();
         if (duplicates) {
             // If duplicates is set, re-add the same header each time.
             Header header = headers.get(0);
             for (int i = 0; i < headers.size(); ++i) {
-                encoder.encodeHeader(outputStream, header.name, header.value, sensitive);
+                try {
+                    encoder.encodeHeader(outputStream, header.name, header.value, sensitive);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             for (int i = 0; i < headers.size(); ++i) {

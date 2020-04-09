@@ -158,11 +158,19 @@ final class TestCase {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     if (maxHeaderTableSize != -1) {
-      encoder.setMaxHeaderTableSize(baos, maxHeaderTableSize);
+      try {
+        encoder.setMaxHeaderTableSize(baos, maxHeaderTableSize);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     for (HeaderField e: headers) {
-      encoder.encodeHeader(baos, e.name, e.value, sensitive);
+      try {
+        encoder.encodeHeader(baos, e.name, e.value, sensitive);
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
     }
 
     return baos.toByteArray();

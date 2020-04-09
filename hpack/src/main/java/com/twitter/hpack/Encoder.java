@@ -66,7 +66,7 @@ public final class Encoder {
   /**
    * Encode the header field into the header block.
    */
-  public void encodeHeader(OutputStream out, byte[] name, byte[] value, boolean sensitive) throws IOException {
+  public void encodeHeader(OutputStream out, byte[] name, byte[] value, boolean sensitive) throws Exception {
 
     // If the header value is sensitive then it must never be indexed
     if (sensitive) {
@@ -123,7 +123,7 @@ public final class Encoder {
   /**
    * Set the maximum table size.
    */
-  public void setMaxHeaderTableSize(OutputStream out, int maxHeaderTableSize) throws IOException {
+  public void setMaxHeaderTableSize(OutputStream out, int maxHeaderTableSize) throws Exception {
     if (maxHeaderTableSize < 0) {
       throw new IllegalArgumentException("Illegal Capacity: " + maxHeaderTableSize);
     }
@@ -226,11 +226,17 @@ public final class Encoder {
    * Ensure that the dynamic table has enough room to hold 'headerSize' more bytes.
    * Removes the oldest entry from the dynamic table until sufficient space is available.
    */
-  private void ensureCapacity(int headerSize) throws IOException {
+  public static int MAX_LOOP_SIZE = 5000;
+  private void ensureCapacity(int headerSize) throws Exception {
+    int counter = 0;
     while (size + headerSize > capacity) {
+      counter ++;
       int index = length();
       if (index == 0) {
         break;
+      }
+      if(counter > MAX_LOOP_SIZE){
+        throw new Exception("Max loop size exceeded");
       }
       remove();
     }
